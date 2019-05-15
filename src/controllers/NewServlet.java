@@ -31,6 +31,7 @@ public class NewServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // TODO Auto-generated method stub
+    //セキュリティ対策のためセッションIDをリクエストスコープに登録
     request.setAttribute("_token",request.getSession().getId());
 
     request.setAttribute("task", new Task());

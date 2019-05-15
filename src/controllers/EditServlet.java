@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.servlet.RequestDispatcher;
@@ -15,16 +14,16 @@ import models.Task;
 import util.DBUtil;
 
 /**
- * Servlet implementation class IndexServlet
+ * Servlet implementation class EditServlet
  */
-@WebServlet("/index")
-public class IndexServlet extends HttpServlet {
+@WebServlet("/edit")
+public class EditServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public IndexServlet() {
+    public EditServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -36,20 +35,21 @@ public class IndexServlet extends HttpServlet {
         // TODO Auto-generated method stub
         EntityManager em = DBUtil.createEntityManager();
 
-        //tasksテーブルの一覧を取得
-        List<Task> tasks = em.createNamedQuery("getAllTasks",Task.class).getResultList();
+        //show.jspから"${pageContext.request.contextPath }/edit?id=${task.id}"によって送信されたidのメッセージを取得
+        Task t = em.find(Task.class,Integer.parseInt(request.getParameter("id")));
 
         em.close();
 
-        //取得したタスクリストをリクエストスコープに登録し/index.jspへ送信
-        request.setAttribute("tasks",tasks);
-        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/tasks/index.jsp");
-        rd.forward(request, response);
+        //メッセージ情報とセッションIDをリクエストスコープに登録
+        request.setAttribute("task", t);
+        request.setAttribute("_token",request.getSession().getId());
+
+        // edit・destroy用にメッセージIDをセッションスコープに登録。※編集処理後削除すること。
+        request.getSession().setAttribute("task_id", t.getId());
+
+
+        RequestDispatcher rd =request.getRequestDispatcher("/WEB-INF/views/tasks/edit.jsp");
+        rd.forward(request,response);
     }
-
-    /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-     */
-
 
 }
